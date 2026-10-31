@@ -121,22 +121,22 @@ export default function HomePage() {
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3">
-            <button
-              onClick={() => alert("Launching Linux Terminal Sandbox...")}
+            <Link
+              href="/learn/the-shell-awakening"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-6 py-3 text-sm font-semibold text-black transition shadow-[0_0_25px_rgba(16,185,129,0.35)]"
             >
               <Terminal className="h-4 w-4" />
-              <span>Launch Terminal Simulator</span>
+              <span>Launch Lesson 1: The Shell Awakening</span>
               <ArrowRight className="h-4 w-4" />
-            </button>
+            </Link>
 
-            <button
-              onClick={() => alert("Opening Command Codex...")}
+            <Link
+              href="/learn"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-black/60 hover:bg-zinc-900 px-5 py-3 text-sm font-medium text-zinc-200 transition backdrop-blur-md"
             >
               <Code className="h-4 w-4 text-zinc-400" />
-              <span>Explore 130+ Command Codex</span>
-            </button>
+              <span>Explore All 5 Lessons</span>
+            </Link>
           </div>
 
           {/* Interactive Feature Highlights Pill Strip */}
