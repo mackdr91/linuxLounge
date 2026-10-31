@@ -391,9 +391,12 @@ export default function TerminalEmulator({
               <button
                 type="button"
                 onClick={() => setCoPilotExpanded(!coPilotExpanded)}
-                className="text-zinc-500 hover:text-zinc-300 p-0.5"
+                className={`p-0.5 rounded transition-transform duration-200 ${
+                  coPilotExpanded ? "rotate-0 text-cyan-400" : "-rotate-180 text-zinc-500 hover:text-zinc-300"
+                }`}
+                title={coPilotExpanded ? "Collapse" : "Expand"}
               >
-                {coPilotExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
+                <ChevronDown className="h-3 w-3" />
               </button>
               <button
                 type="button"
@@ -405,33 +408,39 @@ export default function TerminalEmulator({
             </div>
           </div>
 
-          {coPilotExpanded && (
-            <div className="max-h-40 overflow-y-auto p-3 text-[11px] leading-relaxed text-zinc-300 font-sans">
-              {coPilotCard.loading ? (
-                <div className="flex items-center gap-2 text-zinc-500">
-                  <div className="h-3 w-3 animate-spin rounded-full border border-cyan-400 border-t-transparent" />
-                  <span>Analyzing command structure & flags...</span>
-                </div>
-              ) : (
-                <div className="space-y-1.5">
-                  {coPilotCard.explanation.split("\n\n").map((par, i) => {
-                    if (par.startsWith("### ")) {
+          <div
+            className={`grid transition-[grid-template-rows] duration-250 ease-out ${
+              coPilotExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            }`}
+          >
+            <div className="overflow-hidden">
+              <div className="max-h-48 overflow-y-auto p-3 text-[11px] leading-relaxed text-zinc-300 font-sans">
+                {coPilotCard.loading ? (
+                  <div className="flex items-center gap-2 text-zinc-500">
+                    <div className="h-3 w-3 animate-spin rounded-full border border-cyan-400 border-t-transparent" />
+                    <span>Analyzing command structure & flags...</span>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    {coPilotCard.explanation.split("\n\n").map((par, i) => {
+                      if (par.startsWith("### ")) {
+                        return (
+                          <h4 key={i} className="font-semibold text-zinc-100 text-xs">
+                            {par.replace("### ", "")}
+                          </h4>
+                        );
+                      }
                       return (
-                        <h4 key={i} className="font-semibold text-zinc-100 text-xs">
-                          {par.replace("### ", "")}
-                        </h4>
+                        <p key={i} className="text-zinc-400 text-xs leading-normal">
+                          {par}
+                        </p>
                       );
-                    }
-                    return (
-                      <p key={i} className="text-zinc-400 text-xs leading-normal">
-                        {par}
-                      </p>
-                    );
-                  })}
-                </div>
-              )}
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>

@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { HelpCircle, ChevronDown, ChevronUp, Terminal, ArrowRight, ShieldCheck, Zap } from "lucide-react";
+import { HelpCircle, ChevronDown, Terminal, ArrowRight, Zap } from "lucide-react";
+import { soundEffects } from "@/lib/soundEffects";
 
 interface FAQItem {
   question: string;
@@ -41,6 +42,7 @@ export default function ObjectionKillingFAQ() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   const toggle = (idx: number) => {
+    soundEffects.playKeyClick();
     setOpenIdx(openIdx === idx ? null : idx);
   };
 
@@ -49,50 +51,70 @@ export default function ObjectionKillingFAQ() {
       <div className="max-w-4xl mx-auto space-y-12">
         {/* Header */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/80 px-3.5 py-1 text-xs text-zinc-300 font-mono">
+          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/80 px-3.5 py-1 text-xs text-zinc-300 font-mono shadow-machined">
             <HelpCircle className="h-3.5 w-3.5 text-emerald-400" />
             <span>Frequently Asked Questions</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             Clear Answers For Skeptical Developers
           </h2>
-          <p className="text-zinc-400 text-sm max-w-lg mx-auto">
+          <p className="text-zinc-400 text-sm max-w-lg mx-auto leading-relaxed">
             Everything you need to know about our browser execution sandbox and AI co-pilot.
           </p>
         </div>
 
-        {/* Accordion */}
+        {/* Smooth CSS Grid Transition Accordion */}
         <div className="space-y-3">
           {FAQS.map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
               <div
                 key={idx}
-                className="rounded-xl border border-zinc-800 bg-zinc-950/80 overflow-hidden transition"
+                className={`rounded-xl border transition-all duration-300 overflow-hidden shadow-machined ${
+                  isOpen
+                    ? "border-emerald-500/40 bg-zinc-950 shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
+                    : "border-zinc-850 bg-zinc-950/60 hover:border-zinc-750 hover:bg-zinc-950/90"
+                }`}
               >
                 <button
+                  type="button"
                   onClick={() => toggle(idx)}
-                  className="w-full flex items-center justify-between p-5 text-left text-sm sm:text-base font-semibold text-zinc-200 hover:text-white transition"
+                  aria-expanded={isOpen}
+                  className="w-full flex items-center justify-between p-5 text-left text-sm sm:text-base font-semibold text-zinc-200 hover:text-white transition group cursor-pointer"
                 >
-                  <span>{faq.question}</span>
-                  {isOpen ? (
-                    <ChevronUp className="h-4 w-4 text-emerald-400 shrink-0 ml-4" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-zinc-500 shrink-0 ml-4" />
-                  )}
-                </button>
-                {isOpen && (
-                  <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-zinc-400 leading-relaxed border-t border-zinc-850">
-                    {faq.answer}
+                  <span className="group-hover:translate-x-0.5 transition-transform duration-200">
+                    {faq.question}
+                  </span>
+                  <div
+                    className={`h-7 w-7 rounded-full flex items-center justify-center shrink-0 ml-4 border transition-all duration-300 ${
+                      isOpen
+                        ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400 rotate-180"
+                        : "bg-zinc-900 border-zinc-800 text-zinc-400 rotate-0"
+                    }`}
+                  >
+                    <ChevronDown className="h-4 w-4 transition-transform duration-300" />
                   </div>
-                )}
+                </button>
+
+                {/* CSS Grid Smooth Height Interpolation */}
+                <div
+                  className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+                    isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-zinc-400 leading-relaxed border-t border-zinc-850/60">
+                      {faq.answer}
+                    </div>
+                  </div>
+                </div>
               </div>
             );
           })}
         </div>
 
         {/* Final High-Converting Bottom CTA Banner */}
-        <div className="relative rounded-2xl border border-emerald-500/40 bg-gradient-to-r from-emerald-950/50 via-zinc-950 to-zinc-950 p-8 sm:p-10 shadow-2xl text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden">
+        <div className="relative rounded-2xl border border-emerald-500/40 bg-gradient-to-r from-emerald-950/50 via-zinc-950 to-zinc-950 p-8 sm:p-10 shadow-bevel-glow text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden">
           <div className="space-y-2 z-10 max-w-xl">
             <div className="inline-flex items-center gap-2 text-xs font-mono text-emerald-400">
               <Zap className="h-3.5 w-3.5" />
@@ -109,7 +131,7 @@ export default function ObjectionKillingFAQ() {
           <div className="z-10 shrink-0">
             <Link
               href="/learn/the-shell-awakening"
-              className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-6 py-3.5 text-sm font-bold text-black transition shadow-[0_0_30px_rgba(16,185,129,0.35)]"
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-6 py-3.5 text-sm font-bold text-black transition shadow-bevel-glow"
             >
               <Terminal className="h-4 w-4" />
               <span>Launch Sandbox</span>
