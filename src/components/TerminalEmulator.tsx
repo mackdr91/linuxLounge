@@ -16,6 +16,7 @@ import {
 import {
   createInitialVM,
   executeCommand,
+  getCompletions,
   VirtualMachineState,
 } from "@/lib/virtualTerminal";
 import { LabTask } from "@/types/lesson";
@@ -204,6 +205,66 @@ export default function TerminalEmulator({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // 1. Ctrl+L: Clear screen
+    if (e.ctrlKey && (e.key === "l" || e.key === "L")) {
+      e.preventDefault();
+      setLines([]);
+      return;
+    }
+
+    // 2. Ctrl+C: Cancel current input prompt
+    if (e.ctrlKey && (e.key === "c" || e.key === "C")) {
+      e.preventDefault();
+      const promptPrefix = formatPrompt(vm);
+      setLines((prev) => [
+        ...prev,
+        {
+          id: `cmd-cancel-${Date.now()}`,
+          type: "prompt",
+          promptPrefix,
+          text: input + "^C",
+        },
+      ]);
+      setInput("");
+      setHistoryIdx(-1);
+      return;
+    }
+
+    // 3. Tab: Filesystem path autocompletion
+    if (e.key === "Tab") {
+      e.preventDefault();
+      const currentInput = input;
+      const tokens = currentInput.split(" ");
+      const lastToken = tokens[tokens.length - 1];
+
+      if (lastToken) {
+        const matches = getCompletions(lastToken, vm);
+        if (matches.length === 1) {
+          tokens[tokens.length - 1] = matches[0];
+          setInput(tokens.join(" "));
+        } else if (matches.length > 1) {
+          // Find common prefix or display candidate list
+          const promptPrefix = formatPrompt(vm);
+          setLines((prev) => [
+            ...prev,
+            {
+              id: `tab-prompt-${Date.now()}`,
+              type: "prompt",
+              promptPrefix,
+              text: currentInput,
+            },
+            {
+              id: `tab-out-${Date.now()}`,
+              type: "output",
+              text: matches.map((m) => m.split("/").filter(Boolean).pop() || m).join("  "),
+            },
+          ]);
+        }
+      }
+      return;
+    }
+
+    // History traversal
     if (e.key === "ArrowUp") {
       e.preventDefault();
       if (!vm.history.length) return;

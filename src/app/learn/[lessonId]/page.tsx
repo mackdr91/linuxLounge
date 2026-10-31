@@ -16,6 +16,7 @@ import {
   Bot,
   Sparkles,
   Zap,
+  Award,
 } from "lucide-react";
 import { LESSONS } from "@/data/lessons";
 import TerminalEmulator from "@/components/TerminalEmulator";
@@ -39,6 +40,7 @@ export default function LessonWorkspacePage() {
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("lesson");
   const [mobileMode, setMobileMode] = useState<MobileViewMode>("guide");
   const [completedTaskIds, setCompletedTaskIds] = useState<string[]>([]);
+  const [userXpBalance, setUserXpBalance] = useState<number>(0);
   const [externalCommand, setExternalCommand] = useState<string | null>(null);
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
   const [isAiTutorOpen, setIsAiTutorOpen] = useState(false);
@@ -47,7 +49,38 @@ export default function LessonWorkspacePage() {
   const [xpToast, setXpToast] = useState<{ message: string; xp: number } | null>(null);
   const [beamTarget, setBeamTarget] = useState(false);
 
-  // Load completed tasks from localStorage
+  // 1. XP Handoff Bridge: Check guest hero XP on mount
+  useEffect(() => {
+    try {
+      const heroXp = localStorage.getItem("linux_lounge_hero_xp");
+      const acknowledged = localStorage.getItem("linux_lounge_hero_xp_acknowledged");
+
+      let currentBalance = 0;
+      const savedBalance = localStorage.getItem("linux_lounge_total_xp");
+      if (savedBalance) {
+        currentBalance = parseInt(savedBalance, 10) || 0;
+      }
+
+      if (heroXp && !acknowledged) {
+        const bonus = parseInt(heroXp, 10) || 50;
+        const newBalance = currentBalance + bonus;
+        setUserXpBalance(newBalance);
+        localStorage.setItem("linux_lounge_total_xp", String(newBalance));
+        localStorage.setItem("linux_lounge_hero_xp_acknowledged", "true");
+
+        soundEffects.playTaskSuccess();
+        setXpToast({
+          message: `🎉 +${bonus} XP from Sandbox Claimed! Current Balance: ${newBalance} XP`,
+          xp: bonus,
+        });
+        setTimeout(() => setXpToast(null), 5000);
+      } else {
+        setUserXpBalance(currentBalance);
+      }
+    } catch {}
+  }, []);
+
+  // 2. Load completed tasks from localStorage
   useEffect(() => {
     try {
       const stored = localStorage.getItem(`tasks_${lesson.id}`);
@@ -66,8 +99,13 @@ export default function LessonWorkspacePage() {
     setCompletedTaskIds(updated);
     soundEffects.playTaskSuccess();
 
+    const taskXp = task?.xp || 25;
+    const updatedBalance = userXpBalance + taskXp;
+    setUserXpBalance(updatedBalance);
+
     try {
       localStorage.setItem(`tasks_${lesson.id}`, JSON.stringify(updated));
+      localStorage.setItem("linux_lounge_total_xp", String(updatedBalance));
 
       // Check if all tasks in lesson are finished
       if (updated.length === lesson.tasks.length) {
@@ -110,7 +148,7 @@ export default function LessonWorkspacePage() {
   return (
     <div className="flex h-screen flex-col bg-black text-zinc-100 font-sans overflow-hidden">
       {/* Top HUD */}
-      <header className="flex h-12 items-center justify-between border-b border-zinc-800 bg-zinc-950 px-4 shadow-machined z-20">
+      <header className="flex h-12 items-center justify-between border-b border-zinc-800 bg-zinc-950 px-4 shadow-machined z-20 shrink-0">
         <div className="flex items-center gap-3">
           <Link
             href="/learn"
@@ -120,7 +158,7 @@ export default function LessonWorkspacePage() {
             <span className="hidden sm:inline">All Lessons</span>
           </Link>
           <span className="text-zinc-700">|</span>
-          <span className="text-xs font-semibold text-zinc-200 truncate max-w-[200px] sm:max-w-none">
+          <span className="text-xs font-semibold text-zinc-200 truncate max-w-[180px] sm:max-w-none">
             Lesson 0{lesson.number}: {lesson.title}
           </span>
         </div>
@@ -161,8 +199,13 @@ export default function LessonWorkspacePage() {
 
         {/* Desktop Controls */}
         <div className="hidden lg:flex items-center gap-2.5">
-          <div className="flex items-center gap-1 rounded bg-zinc-900 border border-zinc-800 px-2.5 py-1 text-xs font-mono text-amber-400 shadow-machined">
-            <Zap className="h-3 w-3 fill-amber-400" />
+          <div className="flex items-center gap-1.5 rounded bg-amber-950/40 border border-amber-800/40 px-2.5 py-1 text-xs font-mono text-amber-400 shadow-machined">
+            <Award className="h-3.5 w-3.5 fill-amber-400" />
+            <span className="tabular-nums font-bold">{userXpBalance} XP</span>
+          </div>
+
+          <div className="flex items-center gap-1 rounded bg-zinc-900 border border-zinc-800 px-2.5 py-1 text-xs font-mono text-zinc-300 shadow-machined">
+            <Zap className="h-3 w-3 text-emerald-400 fill-emerald-400" />
             <span className="tabular-nums">
               {completedTaskIds.length}/{lesson.tasks.length} Done
             </span>
@@ -187,7 +230,7 @@ export default function LessonWorkspacePage() {
           }`}
         >
           {/* Tabs */}
-          <div className="flex h-10 items-center border-b border-zinc-850 bg-zinc-950 px-2">
+          <div className="flex h-10 items-center border-b border-zinc-850 bg-zinc-950 px-2 shrink-0">
             <button
               onClick={() => setActiveTab("lesson")}
               className={`flex items-center gap-1.5 border-b-2 px-3.5 h-full text-xs font-medium transition ${

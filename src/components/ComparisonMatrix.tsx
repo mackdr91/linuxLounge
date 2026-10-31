@@ -1,5 +1,6 @@
 import React from "react";
-import { Check, X, ShieldAlert, Sparkles, Terminal, Flame } from "lucide-react";
+import Link from "next/link";
+import { Check, X, ShieldAlert, Terminal, Flame, ArrowRight } from "lucide-react";
 
 interface MatrixRow {
   feature: string;
@@ -48,7 +49,7 @@ export default function ComparisonMatrix() {
       <div className="max-w-5xl mx-auto space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/40 px-3.5 py-1 text-xs text-emerald-400 font-mono">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/40 px-3.5 py-1 text-xs text-emerald-400 font-mono shadow-machined">
             <Flame className="h-3.5 w-3.5" />
             <span>Escape Tutorial Hell</span>
           </div>
@@ -61,7 +62,7 @@ export default function ComparisonMatrix() {
         </div>
 
         {/* Comparison Table */}
-        <div className="overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-950/80 shadow-2xl backdrop-blur-sm">
+        <div className="overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-950/80 shadow-2xl backdrop-blur-sm shadow-inner-bezel">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-zinc-800 bg-zinc-900/60 text-xs uppercase tracking-wider text-zinc-400">
@@ -102,6 +103,27 @@ export default function ComparisonMatrix() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Bottom Transition Callout Row */}
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950/90 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-inner-bezel">
+          <div className="flex items-center gap-3 text-center sm:text-left">
+            <div className="h-10 w-10 rounded-lg border border-emerald-500/40 bg-emerald-950/40 flex items-center justify-center shrink-0">
+              <Terminal className="h-5 w-5 text-emerald-400" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-white">Stop watching. Start typing.</h4>
+              <p className="text-xs text-zinc-400">Zero configuration, zero risk. Your browser sandbox is already loaded.</p>
+            </div>
+          </div>
+
+          <Link
+            href="/learn/the-shell-awakening"
+            className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-5 py-2.5 text-xs font-bold text-black transition shadow-glow-emerald shrink-0"
+          >
+            <span>Launch Sandbox in &lt;3s</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </div>
     </section>

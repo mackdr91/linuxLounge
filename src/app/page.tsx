@@ -12,6 +12,8 @@ import {
   Flame,
   CheckCircle2,
   Award,
+  ShieldCheck,
+  BookCheck,
 } from "lucide-react";
 import TerminalTypingCanvas from "@/components/TerminalTypingCanvas";
 import InteractiveHeroTerminal from "@/components/InteractiveHeroTerminal";
@@ -50,7 +52,69 @@ export default function HomePage() {
 
   return (
     <div className="relative min-h-screen w-full bg-black font-sans text-zinc-100 selection:bg-emerald-500/30 selection:text-emerald-300">
-      {/* 1. HERO SECTION WITH ADAPTIVE VERTICAL RHYTHM (NOT CONSTRAINED RIGIDLY TO 100VH) */}
+      {/* 1. STICKY TOP HUD */}
+      <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between px-6 sm:px-12 border-b border-zinc-800/60 bg-black/80 backdrop-blur-md shadow-inner-bezel">
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 text-zinc-100 hover:text-white transition group"
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-950/80 group-hover:border-emerald-500/50 shadow-machined transition">
+            <Terminal className="h-4 w-4 text-emerald-400" />
+          </div>
+          <span className="font-semibold text-sm tracking-tight text-zinc-100 font-mono">
+            Linux Lounge
+          </span>
+        </Link>
+
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Link
+            href="/learn"
+            className="text-xs font-mono text-zinc-300 hover:text-emerald-400 transition hidden md:inline-block"
+          >
+            Curriculum (5 Labs)
+          </Link>
+
+          <a
+            href="https://github.com/mackdr91/linuxLounge"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-mono text-zinc-400 hover:text-zinc-200 transition hidden sm:inline-block"
+          >
+            GitHub
+          </a>
+
+          {/* Compact Top Action CTA */}
+          <Link
+            href="/learn/the-shell-awakening"
+            className="inline-flex items-center gap-1.5 rounded-md bg-emerald-500 hover:bg-emerald-400 px-3 py-1.5 text-xs font-bold text-black transition shadow-glow-emerald"
+          >
+            <Terminal className="h-3 w-3" />
+            <span>Launch Free Lab 1</span>
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+
+          {/* Video Play/Pause Control */}
+          <button
+            onClick={toggleVideoPlayback}
+            aria-label={isPlaying ? "Pause background video" : "Play background video"}
+            className="flex items-center gap-1.5 rounded-full border border-zinc-750 bg-black/60 px-2.5 py-1 text-xs text-zinc-300 hover:text-white hover:border-zinc-500 transition backdrop-blur-sm shadow-machined"
+          >
+            {isPlaying ? (
+              <>
+                <Pause className="h-3 w-3 text-emerald-400" />
+                <span className="text-[10px] font-mono hidden sm:inline">Active</span>
+              </>
+            ) : (
+              <>
+                <Play className="h-3 w-3 text-zinc-400" />
+                <span className="text-[10px] font-mono hidden sm:inline">Paused</span>
+              </>
+            )}
+          </button>
+        </div>
+      </header>
+
+      {/* 2. HERO SECTION WITH ADAPTIVE VERTICAL RHYTHM (py-12 min-h-screen) */}
       <section className="relative min-h-screen w-full flex flex-col justify-between overflow-hidden">
         {/* Background Video Layer */}
         <video
@@ -68,7 +132,7 @@ export default function HomePage() {
         {/* Interactive Animated Typing Terminal Simulation Layer */}
         <TerminalTypingCanvas />
 
-        {/* 60% Black Overlay (Explicit constraint maintained) */}
+        {/* 60% Black Overlay */}
         <div
           className="absolute inset-0 bg-black/60 pointer-events-none"
           aria-hidden="true"
@@ -80,51 +144,8 @@ export default function HomePage() {
           aria-hidden="true"
         />
 
-        {/* Sticky Header HUD */}
-        <header className="relative z-20 flex h-16 w-full items-center justify-between px-6 sm:px-12 border-b border-zinc-800/40 backdrop-blur-[2px]">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 text-zinc-100 hover:text-white transition group"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-950/80 group-hover:border-emerald-500/50 shadow-machined transition">
-              <Terminal className="h-4 w-4 text-emerald-400" />
-            </div>
-            <span className="font-semibold text-sm tracking-tight text-zinc-100 font-mono">
-              Linux Lounge
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <Link
-              href="/learn"
-              className="text-xs font-mono text-zinc-300 hover:text-emerald-400 transition hidden sm:inline-block"
-            >
-              Curriculum (5 Labs)
-            </Link>
-
-            {/* Video Play/Pause Control */}
-            <button
-              onClick={toggleVideoPlayback}
-              aria-label={isPlaying ? "Pause background video" : "Play background video"}
-              className="flex items-center gap-2 rounded-full border border-zinc-750 bg-black/60 px-3 py-1 text-xs text-zinc-300 hover:text-white hover:border-zinc-500 transition backdrop-blur-sm shadow-machined"
-            >
-              {isPlaying ? (
-                <>
-                  <Pause className="h-3 w-3 text-emerald-400" />
-                  <span className="text-[11px] font-mono">Video Active</span>
-                </>
-              ) : (
-                <>
-                  <Play className="h-3 w-3 text-zinc-400" />
-                  <span className="text-[11px] font-mono">Paused</span>
-                </>
-              )}
-            </button>
-          </div>
-        </header>
-
         {/* Adaptive Hero Container */}
-        <div className="relative z-20 flex-1 flex flex-col items-center justify-center px-4 py-10 sm:py-14 text-center max-w-5xl mx-auto w-full">
+        <div className="relative z-20 flex-1 flex flex-col items-center justify-center px-4 py-12 text-center max-w-5xl mx-auto w-full">
           {/* Pill Badge */}
           <div className="inline-flex items-center gap-2 rounded-full border border-zinc-750 bg-zinc-950/85 px-4 py-1.5 text-xs text-zinc-300 font-mono shadow-machined backdrop-blur-md mb-5">
             <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
@@ -146,70 +167,77 @@ export default function HomePage() {
             Ditch 40-hour lecture playlists. Practice real commands inside a safe in-browser virtual filesystem with real-time AI error diagnosis and automated lab verification.
           </p>
 
-          {/* Dynamic Personalized Primary CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mt-6 w-full sm:w-auto">
-            <Link
-              href="/learn/the-shell-awakening"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-6 py-3.5 text-sm font-bold text-black transition shadow-bevel-glow"
-            >
-              <Terminal className="h-4 w-4" />
-              {hasClaimableXp ? (
-                <span className="flex items-center gap-1.5">
-                  <Award className="h-4 w-4 fill-black" />
-                  <span>Claim Your +50 XP in Lesson 1</span>
-                </span>
-              ) : (
-                <span>Launch Lesson 1: Free (No Login Needed)</span>
-              )}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+          {/* Primary CTA Area */}
+          <div className="flex flex-col items-center justify-center gap-3 mt-6 w-full">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full sm:w-auto">
+              <Link
+                href="/learn/the-shell-awakening"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-6 py-3.5 text-sm font-bold text-black transition shadow-glow-emerald"
+              >
+                <Terminal className="h-4 w-4" />
+                {hasClaimableXp ? (
+                  <span className="flex items-center gap-1.5">
+                    <Award className="h-4 w-4 fill-black" />
+                    <span>Claim Your +50 XP in Lesson 1</span>
+                  </span>
+                ) : (
+                  <span>Launch Lesson 1: Free (No Login Needed)</span>
+                )}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
 
-            <a
-              href="#curriculum"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-black/60 hover:bg-zinc-900 px-5 py-3.5 text-sm font-medium text-zinc-200 transition backdrop-blur-md shadow-machined"
-            >
-              <Code className="h-4 w-4 text-zinc-400" />
-              <span>Explore 5 Production Labs ↓</span>
-            </a>
+              <a
+                href="#curriculum"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-black/60 hover:bg-zinc-900 px-5 py-3.5 text-sm font-medium text-zinc-200 transition backdrop-blur-md shadow-machined"
+              >
+                <Code className="h-4 w-4 text-zinc-400" />
+                <span>Explore 5 Production Labs ↓</span>
+              </a>
+            </div>
+
+            {/* Anxiety-Reducing Micro-Copy */}
+            <p className="text-[11px] sm:text-xs text-zinc-400 font-mono tracking-tight pt-1">
+              ✓ No credit card &nbsp;•&nbsp; ✓ No registration &nbsp;•&nbsp; ✓ Runs 100% in your browser &nbsp;•&nbsp; ✓ Zero installation
+            </p>
           </div>
 
-          {/* Product-Led Proof: Embedded Interactive Terminal Hero Widget */}
-          <div className="w-full mt-10">
+          {/* Embedded Interactive Terminal Hero Widget */}
+          <div className="w-full mt-8">
             <InteractiveHeroTerminal />
           </div>
         </div>
 
-        {/* Social Proof & Credibility Bar */}
-        <div className="relative z-20 border-t border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md py-4 px-6">
+        {/* Social Proof & Specification Badges */}
+        <div className="relative z-20 border-t border-zinc-800/80 bg-zinc-950/85 backdrop-blur-md py-4 px-6 shadow-inner-bezel">
           <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-around gap-4 text-xs font-mono text-zinc-400">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-              <span>100% In-Browser POSIX Emulation</span>
+              <span>Ubuntu 24.04 LTS / FHS 3.0 POSIX Compliance</span>
             </div>
             <div className="flex items-center gap-2">
-              <Flame className="h-4 w-4 text-amber-400" />
-              <span>Zero Local VirtualBox or Dual-Boot Required</span>
+              <BookCheck className="h-4 w-4 text-cyan-400" />
+              <span>LFCS Domain 1.0 & CompTIA Linux+ (XK0-005) Aligned</span>
             </div>
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-cyan-400" />
-              <span>Gemini 3.8 Flash Terminal Diagnosis</span>
+              <ShieldCheck className="h-4 w-4 text-amber-400" />
+              <span>100% Safe In-Memory Sandbox (Zero Host Risk)</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. THE OLD WAY VS LINUX LOUNGE COMPARISON MATRIX */}
+      {/* 3. THE OLD WAY VS LINUX LOUNGE COMPARISON MATRIX */}
       <ComparisonMatrix />
 
-      {/* 3. TRANSPARENT 5-LESSON CURRICULUM PREVIEW */}
+      {/* 4. TRANSPARENT 5-LESSON CURRICULUM PREVIEW */}
       <div id="curriculum">
         <CurriculumTeaser />
       </div>
 
-      {/* 4. DEEP-DIVE TECHNICAL FEATURE TRIO */}
+      {/* 5. DEEP-DIVE TECHNICAL FEATURE TRIO */}
       <FeatureTrio />
 
-      {/* 5. OBJECTION-KILLING FAQ & FINAL CTA */}
+      {/* 6. OBJECTION-KILLING FAQ & FINAL CTA */}
       <ObjectionKillingFAQ />
 
       {/* Footer */}
@@ -232,7 +260,7 @@ export default function HomePage() {
               rel="noopener noreferrer"
               className="hover:text-zinc-300 transition"
             >
-              GitHub
+              GitHub (mackdr91/linuxLounge)
             </a>
           </div>
         </div>
