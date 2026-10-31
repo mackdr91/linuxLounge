@@ -39,7 +39,7 @@ export default function InteractiveHeroTerminal() {
     const trimmed = rawCmd.trim();
     if (!trimmed) return;
 
-    const res = executeCommand(vm, trimmed);
+    const res = executeCommand(trimmed, vm);
     const newLogs = [...logs, { type: "input" as const, text: `$ ${trimmed}` }];
 
     if (res.clear) {
