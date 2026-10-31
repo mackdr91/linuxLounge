@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Terminal,
@@ -11,6 +11,7 @@ import {
   Code,
   Flame,
   CheckCircle2,
+  Award,
 } from "lucide-react";
 import TerminalTypingCanvas from "@/components/TerminalTypingCanvas";
 import InteractiveHeroTerminal from "@/components/InteractiveHeroTerminal";
@@ -22,6 +23,19 @@ import ObjectionKillingFAQ from "@/components/ObjectionKillingFAQ";
 export default function HomePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [hasClaimableXp, setHasClaimableXp] = useState(false);
+
+  useEffect(() => {
+    const checkXp = () => {
+      try {
+        const val = localStorage.getItem("linux_lounge_hero_xp");
+        if (val) setHasClaimableXp(true);
+      } catch {}
+    };
+    checkXp();
+    window.addEventListener("storage", checkXp);
+    return () => window.removeEventListener("storage", checkXp);
+  }, []);
 
   const toggleVideoPlayback = () => {
     if (!videoRef.current) return;
@@ -36,7 +50,7 @@ export default function HomePage() {
 
   return (
     <div className="relative min-h-screen w-full bg-black font-sans text-zinc-100 selection:bg-emerald-500/30 selection:text-emerald-300">
-      {/* 1. ABOVE THE FOLD 100VH HERO SECTION */}
+      {/* 1. HERO SECTION WITH ADAPTIVE VERTICAL RHYTHM (NOT CONSTRAINED RIGIDLY TO 100VH) */}
       <section className="relative min-h-screen w-full flex flex-col justify-between overflow-hidden">
         {/* Background Video Layer */}
         <video
@@ -46,7 +60,7 @@ export default function HomePage() {
           muted
           playsInline
           preload="auto"
-          className="absolute inset-0 h-full w-full object-cover object-center filter brightness-90 contrast-125"
+          className="absolute inset-0 h-full w-full object-cover object-center filter brightness-90 contrast-125 pointer-events-none"
         >
           <source src="/terminal-bg.mp4" type="video/mp4" />
         </video>
@@ -66,13 +80,13 @@ export default function HomePage() {
           aria-hidden="true"
         />
 
-        {/* Sticky Header */}
+        {/* Sticky Header HUD */}
         <header className="relative z-20 flex h-16 w-full items-center justify-between px-6 sm:px-12 border-b border-zinc-800/40 backdrop-blur-[2px]">
           <Link
             href="/"
             className="flex items-center gap-2.5 text-zinc-100 hover:text-white transition group"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-950/80 group-hover:border-emerald-500/50 transition">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-950/80 group-hover:border-emerald-500/50 shadow-machined transition">
               <Terminal className="h-4 w-4 text-emerald-400" />
             </div>
             <span className="font-semibold text-sm tracking-tight text-zinc-100 font-mono">
@@ -80,7 +94,7 @@ export default function HomePage() {
             </span>
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <Link
               href="/learn"
               className="text-xs font-mono text-zinc-300 hover:text-emerald-400 transition hidden sm:inline-block"
@@ -92,7 +106,7 @@ export default function HomePage() {
             <button
               onClick={toggleVideoPlayback}
               aria-label={isPlaying ? "Pause background video" : "Play background video"}
-              className="flex items-center gap-2 rounded-full border border-zinc-750 bg-black/60 px-3 py-1 text-xs text-zinc-300 hover:text-white hover:border-zinc-500 transition backdrop-blur-sm"
+              className="flex items-center gap-2 rounded-full border border-zinc-750 bg-black/60 px-3 py-1 text-xs text-zinc-300 hover:text-white hover:border-zinc-500 transition backdrop-blur-sm shadow-machined"
             >
               {isPlaying ? (
                 <>
@@ -109,17 +123,17 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* Main Hero Container */}
-        <div className="relative z-20 flex-1 flex flex-col items-center justify-center px-4 py-8 text-center max-w-5xl mx-auto w-full">
+        {/* Adaptive Hero Container */}
+        <div className="relative z-20 flex-1 flex flex-col items-center justify-center px-4 py-10 sm:py-14 text-center max-w-5xl mx-auto w-full">
           {/* Pill Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-700/80 bg-zinc-900/80 px-3.5 py-1 text-xs text-zinc-300 font-mono shadow-lg backdrop-blur-md mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-750 bg-zinc-950/85 px-4 py-1.5 text-xs text-zinc-300 font-mono shadow-machined backdrop-blur-md mb-5">
             <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
             <span>Hands-on Ubuntu Server Sandbox</span>
             <span className="text-zinc-600">•</span>
             <span className="text-emerald-400 font-semibold">Gemini 3.8 AI Co-Pilot</span>
           </div>
 
-          {/* H1 Headline: High-Converting Anti-Video Hook */}
+          {/* H1 Headline */}
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-tight font-sans max-w-4xl">
             Master Linux From the Command Line.{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
@@ -132,20 +146,27 @@ export default function HomePage() {
             Ditch 40-hour lecture playlists. Practice real commands inside a safe in-browser virtual filesystem with real-time AI error diagnosis and automated lab verification.
           </p>
 
-          {/* Primary CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6 w-full sm:w-auto">
+          {/* Dynamic Personalized Primary CTAs */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mt-6 w-full sm:w-auto">
             <Link
               href="/learn/the-shell-awakening"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-6 py-3.5 text-sm font-bold text-black transition shadow-[0_0_25px_rgba(16,185,129,0.35)]"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-6 py-3.5 text-sm font-bold text-black transition shadow-bevel-glow"
             >
               <Terminal className="h-4 w-4" />
-              <span>Launch Lesson 1: Free (No Login Needed)</span>
+              {hasClaimableXp ? (
+                <span className="flex items-center gap-1.5">
+                  <Award className="h-4 w-4 fill-black" />
+                  <span>Claim Your +50 XP in Lesson 1</span>
+                </span>
+              ) : (
+                <span>Launch Lesson 1: Free (No Login Needed)</span>
+              )}
               <ArrowRight className="h-4 w-4" />
             </Link>
 
             <a
               href="#curriculum"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-black/60 hover:bg-zinc-900 px-5 py-3.5 text-sm font-medium text-zinc-200 transition backdrop-blur-md"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-black/60 hover:bg-zinc-900 px-5 py-3.5 text-sm font-medium text-zinc-200 transition backdrop-blur-md shadow-machined"
             >
               <Code className="h-4 w-4 text-zinc-400" />
               <span>Explore 5 Production Labs ↓</span>
@@ -153,13 +174,13 @@ export default function HomePage() {
           </div>
 
           {/* Product-Led Proof: Embedded Interactive Terminal Hero Widget */}
-          <div className="w-full mt-8">
+          <div className="w-full mt-10">
             <InteractiveHeroTerminal />
           </div>
         </div>
 
         {/* Social Proof & Credibility Bar */}
-        <div className="relative z-20 border-t border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md py-3.5 px-6">
+        <div className="relative z-20 border-t border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md py-4 px-6">
           <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-around gap-4 text-xs font-mono text-zinc-400">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-emerald-400" />

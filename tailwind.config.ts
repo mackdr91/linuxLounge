@@ -8,9 +8,25 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
+      },
       colors: {
         background: "#000000",
         foreground: "#ededed",
+        terminal: {
+          canvas: "#050507",
+          prompt: "#10b981",
+          output: "#d4d4d8",
+          error: "#f43f5e",
+          copilot: "#06b6d4",
+          xp: "#f59e0b",
+        },
+      },
+      boxShadow: {
+        "bevel-glow": "inset 0 1px 0 0 rgba(255, 255, 255, 0.07), 0 0 30px rgba(16, 185, 129, 0.22)",
+        "machined": "inset 0 1px 0 0 rgba(255, 255, 255, 0.07)",
       },
     },
   },

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Terminal as TerminalIcon, Sparkles, CheckCircle2, Play, CornerDownLeft, RotateCcw } from "lucide-react";
 import { createInitialVM, executeCommand, VirtualMachineState } from "@/lib/virtualTerminal";
+import { soundEffects } from "@/lib/soundEffects";
 
 interface QuickCmd {
   label: string;
@@ -27,7 +28,19 @@ export default function InteractiveHeroTerminal() {
   ]);
   const [inputVal, setInputVal] = useState("");
   const [completedDemoTask, setCompletedDemoTask] = useState(false);
+  const [isTypingAnimation, setIsTypingAnimation] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Load guest XP status from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("linux_lounge_hero_xp");
+      if (saved) {
+        setCompletedDemoTask(true);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -35,10 +48,7 @@ export default function InteractiveHeroTerminal() {
     }
   }, [logs]);
 
-  const runCommandStr = (rawCmd: string) => {
-    const trimmed = rawCmd.trim();
-    if (!trimmed) return;
-
+  const executeActualCommand = (trimmed: string) => {
     const res = executeCommand(trimmed, vm);
     const newLogs = [...logs, { type: "input" as const, text: `$ ${trimmed}` }];
 
@@ -60,13 +70,48 @@ export default function InteractiveHeroTerminal() {
 
     // Check if user ran the challenge command
     if (trimmed.includes("grep") && trimmed.includes("passwd")) {
-      setCompletedDemoTask(true);
+      if (!completedDemoTask) {
+        setCompletedDemoTask(true);
+        soundEffects.playTaskSuccess();
+        try {
+          localStorage.setItem("linux_lounge_hero_xp", "50");
+          window.dispatchEvent(new Event("storage"));
+        } catch {}
+      }
     }
   };
 
+  // Animated typewriter simulation for clicking quick chips (20ms/char)
+  const triggerTypewriterRun = (targetCmd: string) => {
+    if (isTypingAnimation) return;
+    setIsTypingAnimation(true);
+    setInputVal("");
+
+    let currentIdx = 0;
+    if (typingTimerRef.current) clearInterval(typingTimerRef.current);
+
+    typingTimerRef.current = setInterval(() => {
+      currentIdx++;
+      soundEffects.playKeyClick();
+      setInputVal(targetCmd.slice(0, currentIdx));
+
+      if (currentIdx >= targetCmd.length) {
+        if (typingTimerRef.current) clearInterval(typingTimerRef.current);
+        setTimeout(() => {
+          setIsTypingAnimation(false);
+          executeActualCommand(targetCmd);
+        }, 120);
+      }
+    }, 22);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      runCommandStr(inputVal);
+    soundEffects.playKeyClick();
+    if (e.key === "Enter" && !isTypingAnimation) {
+      const trimmed = inputVal.trim();
+      if (trimmed) {
+        executeActualCommand(trimmed);
+      }
     }
   };
 
@@ -78,11 +123,11 @@ export default function InteractiveHeroTerminal() {
         text: "Terminal reset. In-memory virtual filesystem restored to default state.",
       },
     ]);
-    setCompletedDemoTask(false);
+    setInputVal("");
   };
 
   return (
-    <div className="w-full max-w-4xl rounded-xl border border-zinc-700/80 bg-zinc-950/90 shadow-2xl backdrop-blur-md overflow-hidden text-left font-mono">
+    <div className="w-full max-w-4xl rounded-xl border border-zinc-700/80 bg-[#050507] shadow-2xl backdrop-blur-md overflow-hidden text-left font-mono">
       {/* Top Chrome / Window Bar */}
       <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900/90 px-4 py-2.5">
         <div className="flex items-center gap-2">
@@ -101,7 +146,7 @@ export default function InteractiveHeroTerminal() {
           {completedDemoTask && (
             <span className="inline-flex items-center gap-1 text-[11px] font-sans font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-600/40 px-2 py-0.5 rounded-full animate-pulse">
               <CheckCircle2 className="h-3 w-3" />
-              Demo Lab Solved! (+50 XP)
+              Demo Solved! (+50 XP)
             </span>
           )}
           <button
@@ -118,7 +163,7 @@ export default function InteractiveHeroTerminal() {
       {/* Terminal Output Area */}
       <div
         ref={scrollRef}
-        className="h-56 sm:h-64 overflow-y-auto p-4 text-[13px] leading-relaxed space-y-1.5 bg-black/75 scrollbar-thin scrollbar-thumb-zinc-700"
+        className="h-56 sm:h-64 overflow-y-auto p-4 text-[13px] leading-relaxed space-y-1.5 bg-[#050507] scrollbar-thin scrollbar-thumb-zinc-700"
       >
         {logs.map((log, idx) => (
           <div
@@ -144,26 +189,32 @@ export default function InteractiveHeroTerminal() {
         <input
           type="text"
           value={inputVal}
+          disabled={isTypingAnimation}
           onChange={(e) => setInputVal(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Try typing 'ls -la' or 'grep sysadmin /etc/passwd'..."
-          className="flex-1 bg-transparent text-xs text-zinc-100 placeholder:text-zinc-500 focus:outline-none"
+          placeholder={isTypingAnimation ? "Typing..." : "Try typing 'ls -la' or 'grep sysadmin /etc/passwd'..."}
+          className="flex-1 bg-transparent text-xs text-zinc-100 placeholder:text-zinc-500 focus:outline-none disabled:opacity-80"
         />
         <button
-          onClick={() => runCommandStr(inputVal)}
-          className="ml-2 inline-flex items-center gap-1 rounded bg-zinc-800 hover:bg-zinc-700 px-2 py-1 text-[11px] text-zinc-300 transition"
+          onClick={() => {
+            if (!isTypingAnimation && inputVal.trim()) {
+              executeActualCommand(inputVal.trim());
+            }
+          }}
+          disabled={isTypingAnimation || !inputVal.trim()}
+          className="ml-2 inline-flex items-center gap-1 rounded bg-zinc-800 hover:bg-zinc-700 disabled:opacity-40 px-2 py-1 text-[11px] text-zinc-300 transition"
         >
           <span>Run</span>
           <CornerDownLeft className="h-3 w-3" />
         </button>
       </div>
 
-      {/* Quick Action Chips (Product-Led Proof) */}
+      {/* Quick Action Chips (Product-Led Proof with Typewriter Animation) */}
       <div className="border-t border-zinc-800/60 bg-zinc-950/90 px-4 py-2.5">
         <div className="flex items-center justify-between text-[11px] text-zinc-400 mb-1.5">
           <span className="flex items-center gap-1 text-zinc-400">
             <Sparkles className="h-3 w-3 text-emerald-400" />
-            Quick Test Commands (Click to Execute):
+            Quick Test Commands (Click to Type & Run):
           </span>
           <span className="text-zinc-500 hidden sm:inline">Zero login required</span>
         </div>
@@ -171,8 +222,9 @@ export default function InteractiveHeroTerminal() {
           {QUICK_COMMANDS.map((qc) => (
             <button
               key={qc.command}
-              onClick={() => runCommandStr(qc.command)}
-              className="inline-flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-900/80 hover:border-emerald-500/50 hover:bg-zinc-850 px-2.5 py-1 text-[11px] text-zinc-300 hover:text-emerald-300 transition"
+              disabled={isTypingAnimation}
+              onClick={() => triggerTypewriterRun(qc.command)}
+              className="inline-flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-900/80 hover:border-emerald-500/50 hover:bg-zinc-850 px-2.5 py-1 text-[11px] text-zinc-300 hover:text-emerald-300 disabled:opacity-50 transition"
               title={qc.desc}
             >
               <Play className="h-2.5 w-2.5 text-emerald-400" />
