@@ -7,14 +7,17 @@ import {
   Play,
   Pause,
   ArrowRight,
-  Shield,
   Sparkles,
-  Layers,
   Code,
-  BookOpen,
-  Cpu,
+  Flame,
+  CheckCircle2,
 } from "lucide-react";
 import TerminalTypingCanvas from "@/components/TerminalTypingCanvas";
+import InteractiveHeroTerminal from "@/components/InteractiveHeroTerminal";
+import ComparisonMatrix from "@/components/ComparisonMatrix";
+import CurriculumTeaser from "@/components/CurriculumTeaser";
+import FeatureTrio from "@/components/FeatureTrio";
+import ObjectionKillingFAQ from "@/components/ObjectionKillingFAQ";
 
 export default function HomePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -32,134 +35,187 @@ export default function HomePage() {
   };
 
   return (
-    <main className="relative h-screen w-screen overflow-hidden bg-black font-sans text-zinc-100">
-      {/* 1. Background Video Layer */}
-      <video
-        ref={videoRef}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        className="absolute inset-0 h-full w-full object-cover object-center filter brightness-90 contrast-125"
-      >
-        <source src="/terminal-bg.mp4" type="video/mp4" />
-      </video>
-
-      {/* 2. Interactive Animated Typing Terminal Simulation Layer */}
-      <TerminalTypingCanvas />
-
-      {/* 3. Black Overlay at 60% (as explicitly requested: "black overlay at 60%") */}
-      <div
-        className="absolute inset-0 bg-black/60 pointer-events-none"
-        aria-hidden="true"
-      />
-
-      {/* Subtle scanline / vignette texture */}
-      <div
-        className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_transparent_0%,_rgba(0,0,0,0.4)_100%)]"
-        aria-hidden="true"
-      />
-
-      {/* 4. Top Navigation Bar */}
-      <header className="relative z-20 flex h-16 w-full items-center justify-between px-6 sm:px-12 border-b border-zinc-800/40 backdrop-blur-[2px]">
-        <Link
-          href="/"
-          className="flex items-center gap-2.5 text-zinc-100 hover:text-white transition group"
+    <div className="relative min-h-screen w-full bg-black font-sans text-zinc-100 selection:bg-emerald-500/30 selection:text-emerald-300">
+      {/* 1. ABOVE THE FOLD 100VH HERO SECTION */}
+      <section className="relative min-h-screen w-full flex flex-col justify-between overflow-hidden">
+        {/* Background Video Layer */}
+        <video
+          ref={videoRef}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          className="absolute inset-0 h-full w-full object-cover object-center filter brightness-90 contrast-125"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-950/80 group-hover:border-emerald-500/50 transition">
-            <Terminal className="h-4 w-4 text-emerald-400" />
+          <source src="/terminal-bg.mp4" type="video/mp4" />
+        </video>
+
+        {/* Interactive Animated Typing Terminal Simulation Layer */}
+        <TerminalTypingCanvas />
+
+        {/* 60% Black Overlay (Explicit constraint maintained) */}
+        <div
+          className="absolute inset-0 bg-black/60 pointer-events-none"
+          aria-hidden="true"
+        />
+
+        {/* Vignette Gradient */}
+        <div
+          className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_transparent_0%,_rgba(0,0,0,0.5)_100%)]"
+          aria-hidden="true"
+        />
+
+        {/* Sticky Header */}
+        <header className="relative z-20 flex h-16 w-full items-center justify-between px-6 sm:px-12 border-b border-zinc-800/40 backdrop-blur-[2px]">
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 text-zinc-100 hover:text-white transition group"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-950/80 group-hover:border-emerald-500/50 transition">
+              <Terminal className="h-4 w-4 text-emerald-400" />
+            </div>
+            <span className="font-semibold text-sm tracking-tight text-zinc-100 font-mono">
+              Linux Lounge
+            </span>
+          </Link>
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/learn"
+              className="text-xs font-mono text-zinc-300 hover:text-emerald-400 transition hidden sm:inline-block"
+            >
+              Curriculum (5 Labs)
+            </Link>
+
+            {/* Video Play/Pause Control */}
+            <button
+              onClick={toggleVideoPlayback}
+              aria-label={isPlaying ? "Pause background video" : "Play background video"}
+              className="flex items-center gap-2 rounded-full border border-zinc-750 bg-black/60 px-3 py-1 text-xs text-zinc-300 hover:text-white hover:border-zinc-500 transition backdrop-blur-sm"
+            >
+              {isPlaying ? (
+                <>
+                  <Pause className="h-3 w-3 text-emerald-400" />
+                  <span className="text-[11px] font-mono">Video Active</span>
+                </>
+              ) : (
+                <>
+                  <Play className="h-3 w-3 text-zinc-400" />
+                  <span className="text-[11px] font-mono">Paused</span>
+                </>
+              )}
+            </button>
           </div>
-          <span className="font-semibold text-sm tracking-tight text-zinc-100 font-mono">
-            Linux Lounge
-          </span>
-        </Link>
+        </header>
 
-        {/* Video Play/Pause Control (Modern Web Guidance Accessibility Compliance) */}
-        <button
-          onClick={toggleVideoPlayback}
-          aria-label={isPlaying ? "Pause background video" : "Play background video"}
-          className="flex items-center gap-2 rounded-full border border-zinc-750 bg-black/60 px-3 py-1 text-xs text-zinc-300 hover:text-white hover:border-zinc-500 transition backdrop-blur-sm"
-        >
-          {isPlaying ? (
-            <>
-              <Pause className="h-3 w-3 text-emerald-400" />
-              <span className="text-[11px] font-mono">Video Active</span>
-            </>
-          ) : (
-            <>
-              <Play className="h-3 w-3 text-zinc-400" />
-              <span className="text-[11px] font-mono">Paused</span>
-            </>
-          )}
-        </button>
-      </header>
-
-      {/* 5. Center Hero Content (100vh Fill) */}
-      <div className="relative z-20 flex h-[calc(100vh-4rem)] flex-col items-center justify-center px-4 text-center">
-        <div className="max-w-3xl space-y-6">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-700/80 bg-zinc-900/80 px-3.5 py-1 text-xs text-zinc-300 font-mono shadow-lg backdrop-blur-md">
+        {/* Main Hero Container */}
+        <div className="relative z-20 flex-1 flex flex-col items-center justify-center px-4 py-8 text-center max-w-5xl mx-auto w-full">
+          {/* Pill Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-700/80 bg-zinc-900/80 px-3.5 py-1 text-xs text-zinc-300 font-mono shadow-lg backdrop-blur-md mb-4">
             <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Master Ubuntu Server & Linux Administration</span>
+            <span>Hands-on Ubuntu Server Sandbox</span>
             <span className="text-zinc-600">•</span>
-            <span className="text-emerald-400 font-semibold">Gemini 3.8 AI Co-pilot</span>
+            <span className="text-emerald-400 font-semibold">Gemini 3.8 AI Co-Pilot</span>
           </div>
 
-          {/* Headline */}
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight font-sans">
-            Hands-On Linux.{" "}
+          {/* H1 Headline: High-Converting Anti-Video Hook */}
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-tight font-sans max-w-4xl">
+            Master Linux From the Command Line.{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
-              Zero Guesswork.
+              No Videos. No Fluff.
             </span>
           </h1>
 
           {/* Subtitle */}
-          <p className="mx-auto max-w-xl text-sm sm:text-base text-zinc-300 font-normal leading-relaxed">
-            Practice real terminal commands inside an interactive Linux sandbox. Get real-time AI error diagnosis, flag explanations, and guided certification roadmaps.
+          <p className="mt-4 max-w-2xl text-xs sm:text-base text-zinc-300 font-normal leading-relaxed">
+            Ditch 40-hour lecture playlists. Practice real commands inside a safe in-browser virtual filesystem with real-time AI error diagnosis and automated lab verification.
           </p>
 
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3">
+          {/* Primary CTAs */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6 w-full sm:w-auto">
             <Link
               href="/learn/the-shell-awakening"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-6 py-3 text-sm font-semibold text-black transition shadow-[0_0_25px_rgba(16,185,129,0.35)]"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-6 py-3.5 text-sm font-bold text-black transition shadow-[0_0_25px_rgba(16,185,129,0.35)]"
             >
               <Terminal className="h-4 w-4" />
-              <span>Launch Lesson 1: The Shell Awakening</span>
+              <span>Launch Lesson 1: Free (No Login Needed)</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
 
-            <Link
-              href="/learn"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-black/60 hover:bg-zinc-900 px-5 py-3 text-sm font-medium text-zinc-200 transition backdrop-blur-md"
+            <a
+              href="#curriculum"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-black/60 hover:bg-zinc-900 px-5 py-3.5 text-sm font-medium text-zinc-200 transition backdrop-blur-md"
             >
               <Code className="h-4 w-4 text-zinc-400" />
-              <span>Explore All 5 Lessons</span>
-            </Link>
+              <span>Explore 5 Production Labs ↓</span>
+            </a>
           </div>
 
-          {/* Interactive Feature Highlights Pill Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-6 text-xs text-zinc-400 font-mono">
-            <div className="rounded-lg border border-zinc-800/80 bg-zinc-950/60 p-2.5 backdrop-blur-sm">
-              <span className="block text-emerald-400 font-bold">23 Chapters</span>
-              <span>Foundations to Root</span>
+          {/* Product-Led Proof: Embedded Interactive Terminal Hero Widget */}
+          <div className="w-full mt-8">
+            <InteractiveHeroTerminal />
+          </div>
+        </div>
+
+        {/* Social Proof & Credibility Bar */}
+        <div className="relative z-20 border-t border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md py-3.5 px-6">
+          <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-around gap-4 text-xs font-mono text-zinc-400">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              <span>100% In-Browser POSIX Emulation</span>
             </div>
-            <div className="rounded-lg border border-zinc-800/80 bg-zinc-950/60 p-2.5 backdrop-blur-sm">
-              <span className="block text-cyan-400 font-bold">AI Co-pilot</span>
-              <span>Gemini 3.8 Flash</span>
+            <div className="flex items-center gap-2">
+              <Flame className="h-4 w-4 text-amber-400" />
+              <span>Zero Local VirtualBox or Dual-Boot Required</span>
             </div>
-            <div className="rounded-lg border border-zinc-800/80 bg-zinc-950/60 p-2.5 backdrop-blur-sm">
-              <span className="block text-amber-400 font-bold">Real Sandbox</span>
-              <span>Virtual Filesystem</span>
-            </div>
-            <div className="rounded-lg border border-zinc-800/80 bg-zinc-950/60 p-2.5 backdrop-blur-sm">
-              <span className="block text-rose-400 font-bold">Gamified XP</span>
-              <span>Streaks & Badges</span>
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-cyan-400" />
+              <span>Gemini 3.8 Flash Terminal Diagnosis</span>
             </div>
           </div>
         </div>
+      </section>
+
+      {/* 2. THE OLD WAY VS LINUX LOUNGE COMPARISON MATRIX */}
+      <ComparisonMatrix />
+
+      {/* 3. TRANSPARENT 5-LESSON CURRICULUM PREVIEW */}
+      <div id="curriculum">
+        <CurriculumTeaser />
       </div>
-    </main>
+
+      {/* 4. DEEP-DIVE TECHNICAL FEATURE TRIO */}
+      <FeatureTrio />
+
+      {/* 5. OBJECTION-KILLING FAQ & FINAL CTA */}
+      <ObjectionKillingFAQ />
+
+      {/* Footer */}
+      <footer className="w-full border-t border-zinc-850 bg-black py-8 px-6 text-center text-xs text-zinc-500 font-mono">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-zinc-400">
+            <Terminal className="h-4 w-4 text-emerald-400" />
+            <span>Linux Lounge • Interactive Command-Line Learning</span>
+          </div>
+          <div className="flex items-center gap-4 text-zinc-500">
+            <Link href="/learn" className="hover:text-zinc-300 transition">
+              All Lessons
+            </Link>
+            <Link href="/learn/the-shell-awakening" className="hover:text-zinc-300 transition">
+              Launch Sandbox
+            </Link>
+            <a
+              href="https://github.com/mackdr91/linuxLounge"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-zinc-300 transition"
+            >
+              GitHub
+            </a>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }
